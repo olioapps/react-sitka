@@ -8,8 +8,8 @@ class ChildComponent extends React.Component<TestState, null> {
     public render() {
         return (
             <React.Fragment>
-                <div>Count: {this.props.count}</div>,
-                <div>Count: {this.props.food}</div>,
+                <div>Count: {this.props.count}</div>
+                <div>Food: {this.props.food}</div>
                 <button
                     onClick={() => {
                         SitkaInstance.getModules().test.handleIncrementCount()
@@ -21,13 +21,10 @@ class ChildComponent extends React.Component<TestState, null> {
     }
 }
 
-// export default App
-const mapStateToProps = (state: AppState): TestState => {
-    return state.test
-}
-
 const ConnectedApp: React.ComponentClass<{}> = connect(
-    mapStateToProps,
+    (state: AppState): TestState => {
+        return state.test
+    },
     null,
 )(ChildComponent)
 

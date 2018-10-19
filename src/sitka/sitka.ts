@@ -1,6 +1,6 @@
-import { Store, createStore, Action, combineReducers } from "redux"
+import { Store, createStore, Action, combineReducers, ReducersMapObject } from "redux"
 import createSagaMiddleware from "redux-saga"
-import { applyMiddleware } from "redux"
+import { applyMiddleware, Dispatch } from "redux"
 import { takeEvery, all, apply } from "redux-saga/effects"
 import { createLogger } from "redux-logger"
 
@@ -36,29 +36,38 @@ interface SitkaAction extends Action {
     _args: any,
 }
 
+export class SitkaMeta {
+    readonly sagaRoot: () => IterableIterator<{}> 
+    readonly reducersToCombine: ReducersMapObject
+}
+
 export class Sitka<T = {}, A = {}> {
-    private store: Store<{}>
+    private store: Store
     private sagaMiddleware: any
     private sagas: SagaMeta[] = []
-    private reducersToCombine: {} = {}
+    private reducersToCombine: ReducersMapObject = {}
     protected registeredModules: T
 
     constructor() {
-        this.dispatch = this.dispatch.bind(this)
+        this.doDispatch = this.doDispatch.bind(this)
         this.root = this.root.bind(this)
         this.createStore = this.createStore.bind(this)
         this.registeredModules = <T> {}
+    }
+
+    setStore(store: Store) {
+        this.store = store
     }
 
     getModules(): T {
         return this.registeredModules
     }
 
-    getStore(): Store<{}> {
+    getStore(): Store {
         return this.store
     }
 
-    *root(): any {
+    private *root(): IterableIterator<{}> {
         const toYield = []
         const { registeredModules } = this
         for ( let i = 0; i < this.sagas.length; i++) {
@@ -73,7 +82,14 @@ export class Sitka<T = {}, A = {}> {
         yield all(toYield)
     }
 
-    createStore(): Store<{}> {
+    createSitkaMeta(): SitkaMeta {
+        return {
+            sagaRoot: this.root,
+            reducersToCombine: this.reducersToCombine,
+        }
+    }
+
+    createStore(): Store {
         const logger = createLogger({
             stateTransformer: (state: A) => state,
         })
@@ -95,7 +111,7 @@ export class Sitka<T = {}, A = {}> {
         const setters = methodNames.filter( m => m.indexOf("set") == 0)
         const handlers = methodNames.filter( m => m.indexOf("handle") == 0)
         const moduleName = instance.moduleName()
-        const { sagas, reducersToCombine, dispatch } = this
+        const { sagas, reducersToCombine, doDispatch: dispatch } = this
 
         instance.sitka = this
 
@@ -189,7 +205,10 @@ export class Sitka<T = {}, A = {}> {
         return array
     }
 
-    private dispatch(action: Action): void {
-        this.getStore().dispatch(action)
+    private doDispatch(action: Action): void {
+        const store: Store = this.getStore()
+        if (!!store) {
+            store.dispatch(action)
+        }
     }
 }
