@@ -3,23 +3,20 @@ import "./App.css"
 import { connect } from "react-redux"
 import { SitkaInstance } from "./index"
 
-import { AppState, TestState, sitka, Sitka, SitkaModules } from "./sitka"
+import { AppState, TestState, Test2State, Test3State, sitka, Sitka, SitkaModules } from "./sitka"
 
 class ChildComponent extends React.Component<AppState, {}> {
     public render() {
-        /* tslint:disable */
-        debugger
-        /* tslint:enable */
         return (
-            <div>
-                <div>{JSON.stringify(this.props, null, 4)}</div>
+            <React.Fragment>
+                <div>{JSON.stringify(this.props, null, 4)}</div>,
                 <button
                     onClick={() => {
                         SitkaInstance.getModules().test.handleIncrementCount()
                     }}>
                     Click
-                </button>
-            </div>
+                </button>,
+            </React.Fragment>
         )
     }
 }
@@ -32,12 +29,10 @@ class ChildComponent extends React.Component<AppState, {}> {
 //     // readonly dispatch: {}
 // }
 
-interface AppProps {
-    // readonly sitka: Sitka
-    // readonly test: TestState
-}
+interface AppProps {}
+type ComponentProps = AppProps & AppState
 
-class App extends React.Component<{}, {}> {
+class App extends React.Component<ComponentProps, {}> {
     public render() {
         return <ChildComponent {...this.props} />
     }
