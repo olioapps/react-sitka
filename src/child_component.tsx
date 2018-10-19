@@ -14,7 +14,7 @@ interface ComponentState {
     other: OtherState,
 }
 
-class ChildComponent extends React.Component<ComponentState & ReduxActions, null> {
+class ChildComponent extends React.Component<ComponentState & ReduxActions, {}> {
     public render() {
         return (
             <React.Fragment>
