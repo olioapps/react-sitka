@@ -1,47 +1,18 @@
 import { Store, createStore, Action, combineReducers, ReducersMapObject } from "redux"
 import createSagaMiddleware from "redux-saga"
-import { applyMiddleware, Dispatch } from "redux"
+import { applyMiddleware } from "redux"
 import { takeEvery, all, apply } from "redux-saga/effects"
 import { createLogger } from "redux-logger"
 
-export type BaseMap<T = any> = { [key: string]: T }
+type BaseMap<T = any> = { [key: string]: T }
 
-export type ConnectedClassAction<T> = Partial<T> & { type: string }
+type ConnectedClassAction<T> = Partial<T> & { type: string }
 
-export abstract class ConnectedClass<T extends BaseMap, X extends Sitka> {
-
-    sitka: X
-
-    abstract moduleName(): string
-
-    // by default, the redux key is same as the moduleName
-    reduxKey(): string {
-        return this.moduleName()
-    }
-
-    abstract defaultState(): T
-
-    createAction(v: Partial<T>): ConnectedClassAction<T> {
-        return Object.assign({type: this.reduxKey()}, v)
-    }
+export class Aron {
+    
 }
 
-interface SagaMeta {
-    readonly handler: any
-    readonly name: string
-}
-
-interface SitkaAction extends Action {
-    _instance: string,
-    _args: any,
-}
-
-export class SitkaMeta {
-    readonly sagaRoot: () => IterableIterator<{}> 
-    readonly reducersToCombine: ReducersMapObject
-}
-
-export class Sitka<T = {}, A = {}> {
+export class Zitka<T = {}> {
     private store: Store<{}>
     private sagaMiddleware: any
     private sagas: SagaMeta[] = []
@@ -91,7 +62,7 @@ export class Sitka<T = {}, A = {}> {
 
     createStore(): Store<{}> {
         const logger = createLogger({
-            stateTransformer: (state: A) => state,
+            stateTransformer: (state: {}) => state,
         })
 
         this.sagaMiddleware = createSagaMiddleware()
@@ -107,7 +78,7 @@ export class Sitka<T = {}, A = {}> {
     }
 
     register<F extends BaseMap, T extends ConnectedClass<F, this>>(instance: T): T {
-        const methodNames = Sitka.getInstanceMethodNames(instance, Object.prototype)
+        const methodNames = getInstanceMethodNames(instance, Object.prototype)
         const setters = methodNames.filter( m => m.indexOf("set") == 0)
         const handlers = methodNames.filter( m => m.indexOf("handle") == 0)
         const moduleName = instance.moduleName()
@@ -182,28 +153,6 @@ export class Sitka<T = {}, A = {}> {
 
         return instance
     }
-    
-    private static hasMethod = (obj: {}, name: string) => {
-        const desc = Object.getOwnPropertyDescriptor (obj, name)
-        return !!desc && typeof desc.value === "function"
-    }
-    
-    private static getInstanceMethodNames = (obj: {}, stop: {}) => {
-        const array: string[] = []
-        let proto = Object.getPrototypeOf (obj)
-        while (proto && proto !== stop) {
-            Object.getOwnPropertyNames (proto)
-            .forEach (name => {
-                if (name !== "constructor") {
-                    if (Sitka.hasMethod (proto, name)) {
-                        array.push (name)
-                    }
-                }
-            })
-            proto = Object.getPrototypeOf(proto)
-        }
-        return array
-    }
 
     private doDispatch(action: Action): void {
         const store: Store<{}> = this.getStore()
@@ -211,4 +160,60 @@ export class Sitka<T = {}, A = {}> {
             store.dispatch(action)
         }
     }
+}
+
+export abstract class ConnectedClass<T extends BaseMap, X extends Zitka> {
+
+    sitka: X
+
+    abstract moduleName(): string
+
+    // by default, the redux key is same as the moduleName
+    reduxKey(): string {
+        return this.moduleName()
+    }
+
+    abstract defaultState(): T
+
+    createAction(v: Partial<T>): ConnectedClassAction<T> {
+        return Object.assign({type: this.reduxKey()}, v)
+    }
+}
+
+export interface SagaMeta {
+    readonly handler: any
+    readonly name: string
+}
+
+export class SitkaMeta {
+    readonly sagaRoot: () => IterableIterator<{}> 
+    readonly reducersToCombine: ReducersMapObject
+}
+
+interface SitkaAction extends Action {
+    _instance: string,
+    _args: any,
+}
+
+    
+const hasMethod = (obj: {}, name: string) => {
+    const desc = Object.getOwnPropertyDescriptor (obj, name)
+    return !!desc && typeof desc.value === "function"
+}
+
+const getInstanceMethodNames = (obj: {}, stop: {}) => {
+    const array: string[] = []
+    let proto = Object.getPrototypeOf (obj)
+    while (proto && proto !== stop) {
+        Object.getOwnPropertyNames (proto)
+        .forEach (name => {
+            if (name !== "constructor") {
+                if (hasMethod (proto, name)) {
+                    array.push (name)
+                }
+            }
+        })
+        proto = Object.getPrototypeOf(proto)
+    }
+    return array
 }

@@ -2,9 +2,7 @@ import * as React from "react"
 import { connect } from "react-redux"
 import * as redux from "redux"
 import { SitkaInstance, actions } from "./index"
-import { OtherState } from "./sitka"
-
-import { AppState, TestState } from "./sitka"
+import { TestState, OtherState, AppState } from './sitka'
 
 interface ReduxActions {
     readonly setColor: (color: string) => void
@@ -24,7 +22,7 @@ class ChildComponent extends React.Component<ComponentState & ReduxActions, {}> 
                 <div>Beer: {this.props.other.beer}</div>
                 <button
                     onClick={() => {
-                        SitkaInstance.getModules().test.handleIncrementCount()
+                        // SitkaInstance.getModules().test.handleIncrementCount()
                     }}>
                     Increment
                 </button>
@@ -39,7 +37,7 @@ class ChildComponent extends React.Component<ComponentState & ReduxActions, {}> 
     }
 }
 
-const mapDispatchToProps = (dispatch: redux.Dispatch<{}>): ReduxActions => ({
+const mapDispatchToProps = (dispatch: redux.Dispatch<redux.AnyAction>): ReduxActions => ({
     setColor: (color: string) => dispatch( actions.setColor(color) ),
 })
 

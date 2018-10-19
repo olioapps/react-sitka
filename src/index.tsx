@@ -9,7 +9,8 @@ import { applyMiddleware } from "redux"
 import { Provider } from "react-redux"
 import { call, takeEvery } from "redux-saga/effects"
 import { createLogger } from "redux-logger"
-import { sitka, SitkaMeta, OtherState, otherDefaultState } from "./sitka"
+import { sitka, OtherState, otherDefaultState } from "./sitka"
+import { SitkaMeta } from "olio-sitka"
 
 export const SitkaInstance = sitka
 
