@@ -42,7 +42,7 @@ export class SitkaMeta {
 }
 
 export class Sitka<T = {}, A = {}> {
-    private store: Store
+    private store: Store<{}>
     private sagaMiddleware: any
     private sagas: SagaMeta[] = []
     private reducersToCombine: ReducersMapObject = {}
@@ -55,7 +55,7 @@ export class Sitka<T = {}, A = {}> {
         this.registeredModules = <T> {}
     }
 
-    setStore(store: Store) {
+    setStore(store: Store<{}>) {
         this.store = store
     }
 
@@ -63,7 +63,7 @@ export class Sitka<T = {}, A = {}> {
         return this.registeredModules
     }
 
-    getStore(): Store {
+    getStore(): Store<{}> {
         return this.store
     }
 
@@ -89,7 +89,7 @@ export class Sitka<T = {}, A = {}> {
         }
     }
 
-    createStore(): Store {
+    createStore(): Store<{}> {
         const logger = createLogger({
             stateTransformer: (state: A) => state,
         })
@@ -206,7 +206,7 @@ export class Sitka<T = {}, A = {}> {
     }
 
     private doDispatch(action: Action): void {
-        const store: Store = this.getStore()
+        const store: Store<{}> = this.getStore()
         if (!!store) {
             store.dispatch(action)
         }

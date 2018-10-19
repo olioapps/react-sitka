@@ -1,31 +1,56 @@
 import * as React from "react"
 import { connect } from "react-redux"
-import { SitkaInstance } from "./index"
+import * as redux from "redux"
+import { SitkaInstance, actions } from "./index"
+import { OtherState } from "./sitka"
 
 import { AppState, TestState } from "./sitka"
 
-class ChildComponent extends React.Component<TestState, null> {
+interface ReduxActions {
+    readonly setColor: (color: string) => void
+}
+interface ComponentState {
+    test: TestState,
+    other: OtherState,
+}
+
+class ChildComponent extends React.Component<ComponentState & ReduxActions, null> {
     public render() {
         return (
             <React.Fragment>
-                <div>Count: {this.props.count}</div>
-                <div>Food: {this.props.food}</div>
+                <div>Count: {this.props.test.count}</div>
+                <div>Food: {this.props.test.food}</div>
+                <div>Color: {this.props.other.color}</div>
+                <div>Beer: {this.props.other.beer}</div>
                 <button
                     onClick={() => {
                         SitkaInstance.getModules().test.handleIncrementCount()
                     }}>
-                    Click
-                </button>,
+                    Increment
+                </button>
+                <button
+                    onClick={() => {
+                        this.props.setColor(`red - ${new Date().getTime()}`)
+                    }}>
+                    Set Color
+                </button>
             </React.Fragment>
         )
     }
 }
 
+const mapDispatchToProps = (dispatch: redux.Dispatch<{}>): ReduxActions => ({
+    setColor: (color: string) => dispatch( actions.setColor(color) ),
+})
+
 const ConnectedApp: React.ComponentClass<{}> = connect(
-    (state: AppState): TestState => {
-        return state.test
+    (state: AppState): ComponentState => {
+        return {
+            test: state.test,
+            other: state.other,
+        }
     },
-    null,
+    mapDispatchToProps,
 )(ChildComponent)
 
 export default ConnectedApp

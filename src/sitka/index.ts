@@ -1,6 +1,5 @@
-// import { Store } from "redux"
 import { call, put, select } from "redux-saga/effects"
-import { ConnectedClass, ConnectedClassAction, Sitka } from "./sitka"
+import { ConnectedClass, ConnectedClassAction, Sitka, SitkaMeta } from "./sitka"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -111,16 +110,27 @@ class Test3 extends ConnectedClass<Test3State, Sitka<SitkaModules, AppState>> {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+export interface OtherState {
+    readonly color: string
+    readonly beer: string
+}
+
+export const otherDefaultState = {
+    color: "",
+    beer: "",
+}
+
 interface SitkaModules {
-    readonly test?: Test
-    readonly test2?: Test2
-    readonly test3?: Test3
+    readonly test: Test
+    readonly test2: Test2
+    readonly test3: Test3
 }
 
 export interface AppState {
     readonly test: TestState
     readonly test2: Test2State
     readonly test3: Test3State
+    readonly other: OtherState
 }
 
 const sitka = new Sitka<SitkaModules, AppState>()
@@ -129,44 +139,14 @@ sitka.register(new Test())
 sitka.register(new Test2())
 sitka.register(new Test3())
 
-const store: any = sitka.createStore()
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-console.log("BEFORE", store.getState())
-
-const { test, test2 } = sitka.getModules()
-
-test.handleCount(130, 120)
-test2.handlePet("Marz")
-console.log("AFTER", store.getState())
-
-test2.handlePet("ZARBS")
-console.log("AFTER", store.getState())
-
-test2.handlePet("glorbs")
-test.handleCount(2, 120)
-console.log("AFTER", store.getState())
-
-test.handleIncrementCount()
-console.log("AFTER", store.getState())
-test.handleIncrementCount()
-console.log("AFTER", store.getState())
-test.handleIncrementCount()
-console.log("AFTER", store.getState())
-test.handleIncrementCount()
-console.log("AFTER", store.getState())
-test.handleIncrementCount()
-console.log("AFTER", store.getState())
-
 const modules = sitka.getModules()
 console.log(modules)
 
 export {
-    store,
     modules,
     sitka,
     SitkaModules,
+    SitkaMeta,
     Sitka,
     TestState,
 }
